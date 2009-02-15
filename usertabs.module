@@ -1,6 +1,7 @@
 <?php
 // $Id$
 
+
 /**
  * @file
  * usertabs.module
@@ -18,7 +19,6 @@ function usertabs_help($page, $arg) {
   switch ($page) {
     case 'admin/help#usertabs':
       return '<p>'. t('User Tabs places the usual edit account tab, which is displayed as a primary tab menu item by default, as a subtab of the view account tab. You should only activate this module if you have more than one primary tab menu items as when you active the contact module, otherwise you may end up with two secondary tabs with no primary tab. This is due to the way the drupal menu system works.') .'</p>';
-
   }
 }
 
@@ -35,6 +35,10 @@ function usertabs_menu() {
   $items['user/%user/edit'] = array(
     'title' => 'Account',
     'type' => MENU_DEFAULT_LOCAL_TASK,
+    'page callback' => 'usertabs_goto',
+    'page arguments' => array(1),
+    'access callback' => 'user_edit_access',
+    'access arguments' => array(1),
     'weight' => -10,
   );
   return $items;
@@ -66,5 +70,13 @@ function usertabs_user_edit($account, $category = 'account') {
   drupal_set_title(check_plain($account->name));
   include_once (drupal_get_path('module', 'user') .'/user.pages.inc');
   return drupal_get_form('user_profile_form', $account, $category);
+}
+
+function usertabs_goto($user) {
+  $dest = drupal_get_destination();
+  // we need to unset this otherwise drupal_goto gets into a loop and goes straight to the destination url
+  unset($_REQUEST['destination']);
+  unset($_REQUEST['edit']['destination']);
+  drupal_goto("user/$user->uid/edit/account", $dest);
 }
 
