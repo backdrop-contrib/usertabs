@@ -32,12 +32,13 @@ function usertabs_menu() {
     'weight' => -10,
     'load arguments' => array('%map', '%index'),
   );
+  //this will replace 'user/%user_category/edit'
   $items['user/%user/edit'] = array(
     'title' => 'Account',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'page callback' => 'usertabs_goto',
     'page arguments' => array(1),
-    'access callback' => 'user_edit_access',
+    'access callback' => 'user_view_access',
     'access arguments' => array(1),
     'weight' => -10,
   );
@@ -49,29 +50,13 @@ function usertabs_menu() {
  */
 function usertabs_menu_alter(&$callbacks) {
   unset($callbacks['user/%user/view']);
+  //move the original edit callback down a level
+  $callbacks['user/%user_category/edit/account'] = $callbacks['user/%user_category/edit'];
   unset($callbacks['user/%user_category/edit']);
-
-  $callbacks['user/%user_category/edit/account']['type'] = MENU_LOCAL_TASK;
-  $callbacks['user/%user_category/edit/account']['page callback'] = 'usertabs_user_edit';
-  $callbacks['user/%user_category/edit/account']['page arguments'] = array(1);
-  $callbacks['user/%user_category/edit/account']['title'] = 'Edit';
-  $callbacks['user/%user_category/edit/account']['access callback'] = 'user_edit_access';
-  $callbacks['user/%user_category/edit/account']['access arguments'] = array(1);
 }
 
-/**
- * Form builder; Present the form to edit a given user or profile category.
- *
- * @ingroup forms
- * @see user_edit_validate()
- * @see user_edit_submit()
- */
-function usertabs_user_edit($account, $category = 'account') {
-  drupal_set_title(check_plain($account->name));
-  include_once (drupal_get_path('module', 'user') .'/user.pages.inc');
-  return drupal_get_form('user_profile_form', $account, $category);
-}
 
+//diverts all links to user/%/edit to new callback
 function usertabs_goto($user) {
   $dest = drupal_get_destination();
   // we need to unset this otherwise drupal_goto gets into a loop and goes straight to the destination url
