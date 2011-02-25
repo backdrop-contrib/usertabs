@@ -1,4 +1,3 @@
-; $Id$
 name = User Tabs
 description = Puts the user account edit tab under the view account tab.
 version = VERSION
