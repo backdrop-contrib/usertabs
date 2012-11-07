@@ -6,82 +6,54 @@
  * @file
  * usertabs.module
  *
- * This module puts the tab for  the edition of the user account under the view tab
+ * This module puts the tab for the edition of the user account under the view tab
  *
- * © Copyright 2009 Robert Garrigos.
- * \author Robert Garrigos http://garrigos.cat
+ * original module by Robert Garrigos http://garrigos.cat
+ * maintained my matslats http://matslats.net
  */
 
-/**
- * Implements hook_help().
- */
-function usertabs_help($page, $arg) {
-  switch ($page) {
-    case 'admin/help#usertabs':
-      return '<p>' . t('User Tabs places the usual edit account tab, which is displayed as a primary tab menu item by default, as a subtab of the view account tab. You should only activate this module if you have more than one primary tab menu items as when you active the contact module, otherwise you may end up with two secondary tabs with no primary tab. This is due to the way the drupal menu system works.') . '</p>';
-  }
-}
-
-
-/**
- * Implements hook_menu().
- */
-function usertabs_menu() {
-
-  $items['user/%user/edit/view'] = array(
-    'title' => 'view',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => -10,
-    'load arguments' => array('%map', '%index'),
-  );
-
-  //this will replace 'user/%user/edit'
-  $items['user/%user/edit/edit'] = array(
-    'title' => 'Edit',
-    'type' => MENU_LOCAL_TASK,
-    'page callback' => 'usertabs_goto',
-    'page arguments' => array(1),
-    'access callback' => 'user_edit_access',
-    'access arguments' => array(1),
-  );
-  //return $items;
-}
 
 /**
  * Implements hook_menu_alter().
  */
 function usertabs_menu_alter(&$callbacks) {
-  //move the original edit callback down a level
-  usertabs_move_item($callbacks, 'user/%user/edit', 'user/%user/edit/edit');
-  usertabs_move_item($callbacks, 'user/%user/view', 'user/%user/edit/view');
-  $callbacks['user/%user/edit/edit']['type'] = MENU_LOCAL_TASK;
-  $callbacks['user/%user/edit/view']['type'] = MENU_DEFAULT_LOCAL_TASK;
-  $callbacks['user/%user_category/edit/account']['type'] = MENU_LOCAL_TASK;
-  unset($callbacks['user/%user_category/edit/account']);
-  $callbacks['user/%user/edit'] = array(
+  $callbacks['user/%user/account'] = array(
     'title' => 'Account',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -10,
     'load arguments' => array('%map', '%index'),
   );
+  //move the original view and edit items down a level
+  _usertabs_move_item($callbacks, 'user/%user/edit', 'user/%user/account/edit', MENU_LOCAL_TASK);
+  _usertabs_move_item($callbacks, 'user/%user/view', 'user/%user/account/view', MENU_DEFAULT_LOCAL_TASK);
 }
 
-function usertabs_move_item(&$callbacks, $from, $to) {
+
+/*
+ * implement hook_drupal_goto
+ */
+function usertabs_drupal_goto_alter(&$path, $options, $response_code) {
+  _update_user_edit_path($path);
+}
+/*
+ * implements hook form_FORM_ID_alter
+ * change the user edit links on the user management form
+ */
+function usertabs_preprocess_link(&$link) {
+  _update_user_edit_path($link['path']);
+}
+
+function _update_user_edit_path(&$path) {
+  $args = explode('/', $path);
+  if (count($args) > 2 && $args[0] == 'user' && $args[2] == 'edit') {
+    $path = str_replace('edit', 'account/edit', $path);
+  }
+}
+
+function _usertabs_move_item(&$callbacks, $from, $to, $type = NULL) {
   $callbacks[$to] = $callbacks[$from];
+  if ($type) {
+    $callbacks[$to]['type'] = $type;
+  }
   unset($callbacks[$from]);
 }
-
-//diverts all links to user/%/edit to new callback
-/**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
- */
-function usertabs_goto($user) {
-  $dest = drupal_get_destination();
-  // we need to unset this otherwise drupal_goto gets into a loop and goes straight to the destination url
-  unset($_GET['destination']);
-  unset($_REQUEST['edit']['destination']);
-  // TODO $dest needs to be an array of keys and values instead of a string.
-  drupal_goto("user/$user->uid/edit/account", array('query' => $dest));
-}
-
