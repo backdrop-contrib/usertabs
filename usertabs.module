@@ -28,6 +28,20 @@ function usertabs_menu_alter(&$callbacks) {
   _usertabs_move_item($callbacks, 'user/%user/view', 'user/%user/account/view', MENU_DEFAULT_LOCAL_TASK);
 }
 
+function _usertabs_move_item(&$callbacks, $from, $to, $type = NULL) {
+  $callbacks[$to] = $callbacks[$from];
+  if ($type) {
+    $callbacks[$to]['type'] = $type;
+  }
+  unset($callbacks[$from]);
+}
+
+/*
+ * implements hook_url_outbound
+ */
+function usertabs_url_outbound(&$path, $options, $original_path) {
+  _update_user_edit_path($path);
+}
 
 /*
  * implement hook_drupal_goto
@@ -44,16 +58,9 @@ function usertabs_preprocess_link(&$link) {
 }
 
 function _update_user_edit_path(&$path) {
+  if (substr($path, 0, 5) != 'user/') return;
   $args = explode('/', $path);
-  if (count($args) > 2 && $args[0] == 'user' && $args[2] == 'edit') {
+  if (count($args) > 2 && $args[2] == 'edit') {
     $path = str_replace('edit', 'account/edit', $path);
   }
-}
-
-function _usertabs_move_item(&$callbacks, $from, $to, $type = NULL) {
-  $callbacks[$to] = $callbacks[$from];
-  if ($type) {
-    $callbacks[$to]['type'] = $type;
-  }
-  unset($callbacks[$from]);
 }
