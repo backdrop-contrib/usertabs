@@ -2,3 +2,4 @@
 name = User Tabs
 description = Puts the user account edit tab under the view account tab.
 core = 7.x
+
