@@ -35,8 +35,8 @@ Current Maintainers
 Credits
 -------
 
-- Ported to Backdrop CMS by Robert Garrigos (https://github.com/robertgarrigos).
-- Originally written for Drupal 6 by Robert Garrigos
+- Ported to Backdrop CMS by Robert Garrigós (https://github.com/robertgarrigos).
+- Originally written for Drupal 6 by Robert Garrigós
 (https://github.com/robertgarrigos).
 - Port based on the Drupal 7 version of this module rewritten by Matthew Slater
 (https://www.drupal.org/u/matslats).
