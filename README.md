@@ -30,7 +30,7 @@ https://github.com/backdrop-contrib/usertabs/issues
 Current Maintainers
 -------------------
 
-- Robert Garrigos (https://github.com/robertgarrigos/)
+- Robert Garrigós (https://github.com/robertgarrigos/)
 
 Credits
 -------
