@@ -5,7 +5,7 @@ Tidy up the tabs on the user profile page. Usertabs places the usual edit
 account tab, which is displayed as a primary tab menu item by default, as a
 subtab of the view account tab.
 
-AYou should only activate this module if you have more than one primary tab menu
+You should only activate this module if you have more than one primary tab menu
 items as when you active the contact module, otherwise you might end up with two
 secondary tabs and no primary tab.
 
